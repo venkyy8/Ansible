@@ -1,0 +1,46 @@
+---
+- name: Create file and restrict write access for bob user
+  hosts: web
+  become: yes
+
+  vars:
+    file_path: /tmp/example.txt
+    file_content: |
+      This is some example content
+      added to the file.
+    restricted_user: bob
+    bob_password: "$6$rounds=656000$saltsalt$T6kfS...exampleHashedPassword"  # Your hashed password here
+
+  tasks:
+    - name: Install acl package
+      apt:
+        name: acl
+        state: present
+      when: ansible_os_family == "Debian" or ansible_distribution == "Ubuntu"
+
+    - name: Create user bob with password if not present
+      user:
+        name: "{{ restricted_user }}"
+        password: "{{ bob_password }}"
+        shell: /bin/bash
+        state: present
+        create_home: yes
+
+    - name: Create the file and add content
+      copy:
+        content: "{{ file_content }}"
+        dest: "{{ file_path }}"
+        mode: '0777'
+
+    - name: Set full permissions 777 on the file (redundant but safe)
+      file:
+        path: "{{ file_path }}"
+        mode: '0777'
+
+    - name: Remove write permission for user bob using ACL
+      acl:
+        path: "{{ file_path }}"
+        entity: "{{ restricted_user }}"
+        etype: user
+        permissions: "r-x"
+        state: present

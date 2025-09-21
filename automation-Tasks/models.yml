@@ -1,0 +1,30 @@
+---
+- name: Conditionally install and start nginx on Ubuntu
+  hosts: web
+  become: yes
+  tasks:
+    - name: Check if nginx is installed
+      ansible.builtin.shell: dpkg -l nginx
+      register: nginx_check
+      ignore_errors: yes
+
+    - name: Install nginx if not installed
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      when: nginx_check.rc != 0
+
+    - name: Copy index.html to nginx web root
+      ansible.builtin.copy:
+        src: /opt/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start and enable nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes

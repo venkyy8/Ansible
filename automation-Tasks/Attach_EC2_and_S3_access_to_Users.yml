@@ -1,0 +1,28 @@
+---
+- name: Create IAM user with full EC2 and S3 access
+  hosts: localhost
+  gather_facts: no
+  collections:
+    - amazon.aws
+
+  vars:
+    iam_username: test-user
+    iam_password: "T3st!23ing@AWS"  # must meet your password policy
+    policies_to_attach:
+      - "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+      - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+  tasks:
+    - name: Ensure IAM user exists with console login and attached policies
+      amazon.aws.iam_user:
+        name: "{{ iam_username }}"
+        state: present
+        path: "/"
+        password: "{{ iam_password }}"
+        password_reset_required: false
+        managed_policies: "{{ policies_to_attach }}"
+      register: user_result
+
+    - name: Show result
+      debug:
+        var: user_result

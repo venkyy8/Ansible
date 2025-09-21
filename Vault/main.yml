@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  vars_files:
+    - secrets.yml
+
+  tasks:
+    - name: Show the database password
+      debug:
+        msg: "Database password is {{ db_password }}"

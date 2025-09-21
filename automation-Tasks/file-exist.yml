@@ -1,0 +1,26 @@
+---
+- name: Copy and execute file if exists
+  hosts: web           # change to your host group or use `all`
+  become: yes          # become root if needed
+  gather_facts: no
+
+  vars:
+    local_file_path: "./example.sh"     # file on your control machine
+    remote_file_path: "/tmp/example.sh" # destination on remote server
+
+  tasks:
+
+    - name: Copy the script file to the remote server
+      ansible.builtin.copy:
+        src: "{{ local_file_path }}"
+        dest: "{{ remote_file_path }}"
+        mode: '0755'
+
+    - name: Check if the file exists
+      ansible.builtin.stat:
+        path: "{{ remote_file_path }}"
+      register: file_stat
+
+    - name: Run the file if it exists
+      ansible.builtin.command: "{{ remote_file_path }}"
+      when: file_stat.stat.exists

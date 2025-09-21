@@ -1,0 +1,54 @@
+---
+- name: Backup MySQL and upload to S3
+  hosts: localhost
+  become: yes
+  vars:
+    # MySQL Credentials
+    mysql_user: root
+    mysql_password: "NewPassword"
+    mysql_database: "ansible"
+    
+    # S3 Details
+    s3_bucket: "mysql-backup-from-ansible-venky"
+    backup_file: "/tmp/{{ mysql_database }}_backup.sql"
+    s3_backup_path: "mysql_backups/{{ mysql_database }}_{{ ansible_date_time.iso8601 }}.sql"
+
+  tasks:
+
+    - name: Ensure mysqldump is available
+      apt:
+        name: mysql-client
+        state: present
+      become: yes
+
+    - name: Dump the MySQL database
+      command: >
+        mysqldump -u {{ mysql_user }} -p{{ mysql_password }} -h localhost {{ mysql_database }}
+      args:
+        chdir: /tmp
+        creates: "{{ backup_file }}"
+      register: mysql_dump
+
+    - name: Save the MySQL dump to file
+      copy:
+        content: "{{ mysql_dump.stdout }}"
+        dest: "{{ backup_file }}"
+
+    - name: Install boto3 via apt
+      apt:
+        name: python3-boto3
+        state: present
+      become: yes
+
+    - name: Upload MySQL backup to S3
+      aws_s3:
+        bucket: "{{ s3_bucket }}"
+        object: "{{ s3_backup_path }}"
+        src: "{{ backup_file }}"
+        mode: put
+        region: "ap-south-1"
+
+    - name: Clean up local backup file
+      file:
+        path: "{{ backup_file }}"
+        state: absent

@@ -1,0 +1,7 @@
+---
+# Apache HTTPD installation
+- name: Install Apache HTTPD
+  apt:
+    name: apache2
+    state: present
+    update_cache: yes

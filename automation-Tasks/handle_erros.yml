@@ -1,0 +1,15 @@
+---
+- name: Playbook using ignore_errors
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Try installing a package that might not exist
+      ansible.builtin.package:
+        name: fake-package
+        state: present
+      ignore_errors: yes
+
+    - name: This task runs regardless of the failure above
+      debug:
+        msg: "This runs even if the package installation failed"

@@ -1,0 +1,17 @@
+# ├── apache
+# │   └── tasks
+# │       └── main.yml
+# ├── main.yml
+# └── nginx
+#     └── tasks
+#         └── main.yml
+
+---
+- hosts: web
+  become: yes
+  roles:
+    - apache
+    - nginx
+
+
+

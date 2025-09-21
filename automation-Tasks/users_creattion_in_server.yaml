@@ -1,0 +1,20 @@
+# install the pre req pachages  'sudo apt-get install python3-passlib'
+---
+- name: Create users with passwords on remote servers
+  hosts: web
+  become: yes
+  vars:
+    users:
+      - username: alice
+        password: "{{ 'AlicePassword123' | password_hash('sha512') }}"
+      - username: bob
+        password: "{{ 'BobPassword456' | password_hash('sha512') }}"
+  tasks:
+    - name: Create users with password
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        password: "{{ item.password }}"
+        shell: /bin/bash
+        state: present
+      loop: "{{ users }}"
+

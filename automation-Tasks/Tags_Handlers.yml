@@ -1,0 +1,120 @@
+---
+- name: Install Jenkins
+  hosts: jenkins_servers
+  become: yes
+  tags: jenkins
+  tasks:
+    - name: Install Java (required for Jenkins)
+      apt:
+        name: openjdk-11-jdk
+        state: present
+      notify: restart jenkins
+
+    - name: Add Jenkins repository and install
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+      notify: restart jenkins
+
+  handlers:
+    - name: restart jenkins
+      service:
+        name: jenkins
+        state: restarted
+
+# ----------------------
+
+- name: Install Maven
+  hosts: maven_servers
+  become: yes
+  tags: maven
+  tasks:
+    - name: Install Maven
+      apt:
+        name: maven
+        state: present
+      notify: maven installed
+
+  handlers:
+    - name: maven installed
+      debug:
+        msg: "Maven installed successfully."
+
+# ----------------------
+
+- name: Install Tomcat
+  hosts: tomcat_servers
+  become: yes
+  tags: tomcat
+  tasks:
+    - name: Install Tomcat9
+      apt:
+        name: tomcat9
+        state: present
+      notify: restart tomcat
+
+  handlers:
+    - name: restart tomcat
+      service:
+        name: tomcat9
+        state: restarted
+
+# ----------------------
+
+- name: Install Nginx
+  hosts: nginx_servers
+  become: yes
+  tags: nginx
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+      notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+# ----------------------
+
+- name: Install Docker
+  hosts: docker_servers
+  become: yes
+  tags: docker
+  tasks:
+    - name: Install dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Add Docker GPG key
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      args:
+        creates: /usr/share/keyrings/docker-archive-keyring.gpg
+
+    - name: Add Docker repo
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+      notify: restart docker
+
+  handlers:
+    - name: restart docker
+      service:
+        name: docker
+        state: restarted

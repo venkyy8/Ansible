@@ -1,0 +1,32 @@
+---
+- name: Basic loop example
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install multiple packages using a loop
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - git
+        - curl
+        - wget
+
+    - name: Create multiple users using a loop
+      user:
+        name: "{{ item }}"
+        state: present
+        shell: /bin/bash
+      loop:
+        - alice
+        - bob
+        - charlie
+
+    - name: Print user names using loop
+      debug:
+        msg: "Creating user {{ item }}"
+      loop:
+        - alice
+        - bob
+        - charlie

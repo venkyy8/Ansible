@@ -1,0 +1,23 @@
+---
+- name: Create IAM user in AWS
+  hosts: localhost
+  gather_facts: no
+  collections:
+    - amazon.aws
+
+  vars:
+    iam_username: test-user
+
+  tasks:
+    - name: Create IAM user with console login password (no reset required)
+      amazon.aws.iam_user:
+        name: "{{ iam_username }}"
+        state: present
+        path: "/"
+        password: "Test123ing"                # Must comply with your AWS password policy
+        password_reset_required: false        # <-- Do NOT force password reset
+      register: user_create
+
+    - name: Show created user info
+      debug:
+        var: user_create
