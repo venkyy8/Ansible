@@ -98,7 +98,7 @@ ansible-playbook playbook.yml --vault-password-file .vault_pass.txt
 ```
 we can see the output
 
-![A](images/vault)
+![A](../images/vault.png)
 
 ---
 

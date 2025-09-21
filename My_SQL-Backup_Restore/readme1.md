@@ -35,7 +35,7 @@ CREATE DATABASE database_name;
 ```sql
 SHOW DATABASES;
 ```
-![A](images/show-databases)
+![A](../images/show-databases.png)
 ### Use a Database
 
 ```sql
@@ -118,7 +118,7 @@ ansible-playbook taking_Backup.yml
 
 #### we can cross check once after doing this task under S3 in aws console
 
-![W](images/mysql-backups-s3)
+![W](../images/mysql-backups-s3.png)
 ---
 
 ## 💾 Restore MySQL Backup
