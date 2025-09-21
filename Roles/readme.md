@@ -11,4 +11,4 @@ This makes automation **more modular, shareable, and easier to maintain**.
 - Sharing roles via **Ansible Galaxy**.
 
 ### Basic Level ROles Structure and use case:
-![B](images/roles-tree.png)
+![B](../images/roles-tree.png)
