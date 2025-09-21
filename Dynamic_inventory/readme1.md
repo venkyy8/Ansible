@@ -1,4 +1,5 @@
 # Dynamic Ansible Inventory with AWS EC2
+In some cases, you may not have static IP addresses or hostnames. Dynamic inventory allows you to pull inventory data from cloud providers like AWS, GCP, or Azure dynamically.
 
 This repository contains a Python script to **dynamically generate an Ansible inventory** from your AWS EC2 instances using **Boto3**.  
 It automatically groups instances by their `env` tag and writes the inventory to a file, ready for Ansible usage.
